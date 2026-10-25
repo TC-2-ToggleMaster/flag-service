@@ -6,8 +6,8 @@ Este é o serviço de CRUD (Create, Read, Update, Delete) do projeto ToggleMaste
 
 ## 📦 Pré-requisitos (Local)
 
-* [Python](https://www.python.org/) (versão 3.9 ou superior)
-* [PostgreSQL](https://www.postgresql.org/download/) (rodando localmente ou em um contêiner Docker)
+* [Python](https://www.python.org/) (versão 3.10 ou superior)
+* [PostgreSQL](https://www.postgresql.org/download/) (instalado e rodando localmente)
 * O `auth-service` deve estar rodando (localmente na porta `8001`).
 
 ## 🚀 Rodando Localmente
@@ -35,15 +35,20 @@ Este é o serviço de CRUD (Create, Read, Update, Delete) do projeto ToggleMaste
     ```
 
 4.  **Instale as Dependências:**
+    No Windows, use o inicializador `py` para executar o pip:
     ```bash
-    pip install -r requirements.txt
+    py -m pip install -r requirements.txt
     ```
 
 5.  **Inicie o Serviço:**
+    No Windows, inicie com o servidor integrado do Flask:
+    ```bash
+    py app.py
+    ```
+    O servidor estará rodando em `http://localhost:8002`. Em Linux/WSL, você também pode iniciar com Gunicorn:
     ```bash
     gunicorn --bind 0.0.0.0:8002 app:app
     ```
-    O servidor estará rodando em `http://localhost:8002`.
 
 ## 🧪 Testando os Endpoints
 
@@ -56,7 +61,7 @@ Este é o serviço de CRUD (Create, Read, Update, Delete) do projeto ToggleMaste
     -H "Authorization: Bearer admin-secreto-123" \
     -d '{"name": "admin-para-flag-service"}'
     ```
-2.  Copie a chave retornada (ex: `tm_key_...`). Vamos chamá-la de `SUA_CHAVE_API` no resto dos exemplos.
+2.  Copie a chave retornada (ex: `tm_key_...`). Vamos chamá-la de `$SUA_CHAVE_API` no resto dos exemplos.
 
 ---
 
@@ -80,19 +85,26 @@ Saída esperada: `{"error":"Authorization header obrigatório"}`
 ```bash
 curl -X POST http://localhost:8002/flags \
 -H "Content-Type: application/json" \
--H "Authorization: Bearer SUA_CHAVE_API" \
+-H "Authorization: Bearer $SUA_CHAVE_API" \
 -d '{
     "name": "enable-new-dashboard",
     "description": "Ativa o novo dashboard para usuários",
     "is_enabled": true
 }'
 ```
+
+ou 
+
+```bash
+postman request POST http://localhost:8002/flags --header "Content-Type:application/json" --header "Authorization: Bearer $$SUA_CHAVE_API" --body '{"name":"enable-new-dashboard","description":"Ativa o novo dashboard para usuários","is_enabled":true}' --report-events=false
+```
+
 Saída esperada: (Um JSON com os dados da flag criada).
 
 **4. Liste todas as Flags:**
 ```bash
 curl http://localhost:8002/flags \
--H "Authorization: Bearer SUA_CHAVE_API"
+-H "Authorization: Bearer $SUA_CHAVE_API"
 ```
 Saída esperada: (Uma lista `[]` contendo a flag que você criou).
 
@@ -100,7 +112,7 @@ Saída esperada: (Uma lista `[]` contendo a flag que você criou).
 ```bash
 curl -X PUT http://localhost:8002/flags/enable-new-dashboard \
 -H "Content-Type: application/json" \
--H "Authorization: Bearer SUA_CHAVE_API" \
+-H "Authorization: Bearer $SUA_CHAVE_API" \
 -d '{"is_enabled": false}'
 ```
 Saída esperada: (O JSON da flag atualizada, com `"is_enabled": false`).
